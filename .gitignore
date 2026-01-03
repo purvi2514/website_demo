@@ -1,0 +1,61 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Node dependencies
+/node_modules
+/backend/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+/backend/coverage
+
+# production / build artifacts
+/build
+/dist
+/.next
+/out
+
+# backend uploads and envs
+/backend/uploads
+/backend/.env
+
+# environment files (local)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# macOS
+.DS_Store
+
+# OS generated
+Thumbs.db
+
+# temp
+tmp/
+temp/
+
+# avoid committing build outputs and uploads
+/public/uploads
+/backend/uploads
+
+# optional: lock files are usually committed
+# package-lock.json
+
