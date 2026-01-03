@@ -16,7 +16,7 @@ export default function PromoBanners() {
                 Free Shipping Above ₹9999
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Fast, reliable delivery across India
+                Fast, reliable delivery across Saudi
               </Typography>
             </Box>
           </Paper>

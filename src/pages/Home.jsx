@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -13,51 +13,64 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import HeroCarousel from "../components/HeroCarousel";
 import ProductCard from "../components/ProductCard";
 import QuickViewModal from "../components/QuickViewModal";
-import CategoriesScroller from "../components/CategoriesScroller";   
-import WhyShop from "../components/WhyShop";                 
-import BookingSection from "../components/BookingSection";   
-import CarNeeds from "../components/CarNeeds";             
-import InstagramSection from "../components/InstagramSection";  // ✅ new import
-import Footer from "../components/Footer";
+import WhyShop from "../components/WhyShop";
+import BookingSection from "../components/BookingSection";
+import CarNeeds from "../components/CarNeeds";
+import InstagramSection from "../components/InstagramSection";
 
+import { API } from "../utils/api";
 import { useLanguage } from "../context/LanguageContext";
 import { formatSAR } from "../utils/currency";
 import { useCart } from "../context/CartContext";
-
-const BEST = [
-  { id: 101, title: "Engine Flush", price: 120, img: "https://images.unsplash.com/photo-1619458367400-0f7c1f5fbaf9?q=80&w=1200&auto=format" },
-  { id: 102, title: "STP", price: 85, img: "https://images.unsplash.com/photo-1583142308222-8a1e0f3b4666?q=80&w=1200&auto=format" },
-  { id: 103, title: "Liqui Moly 10W-50", price: 450, oldPrice: 475, img: "https://images.unsplash.com/photo-1607861859557-87e4a9d6e7a3?q=80&w=1200&auto=format" },
-  { id: 104, title: "Liqui Moly 10W-40", price: 420, oldPrice: 460, img: "https://images.unsplash.com/photo-1618586610611-7c8e0d4a5c5b?q=80&w=1200&auto=format" },
-  { id: 105, title: "Motul 300V", price: 500, img: "https://images.unsplash.com/photo-1625641853818-4d81f1da443e?q=80&w=1200&auto=format" },
-  { id: 106, title: "Castrol Power1", price: 380, img: "https://images.unsplash.com/photo-1520095972714-909e91b512cf?q=80&w=1200&auto=format" },
-  { id: 107, title: "Shell Advance", price: 360, img: "https://images.unsplash.com/photo-1471479913413-c3d3b1f3d63a?q=80&w=1200&auto=format" },
-  { id: 108, title: "Mobil Super", price: 340, img: "https://images.unsplash.com/photo-1613587752134-23dba3dbf99b?q=80&w=1200&auto=format" },
-  { id: 109, title: "Motul Chain Lube", price: 150, img: "https://images.unsplash.com/photo-1607860108855-c8b62b962b1f?q=80&w=1200&auto=format" },
-  { id: 110, title: "WD-40 Cleaner", price: 90, img: "https://images.unsplash.com/photo-1587370560942-0a444d2aa1e0?q=80&w=1200&auto=format" }
-];
+import { useWishlist } from "../context/WishlistContext"; // ✅ use global wishlist
 
 export default function Home() {
   const { t, lang } = useLanguage();
   const { addToCart } = useCart();
+  const { wishlist, addToWishlist } = useWishlist(); // ✅ consume context
+
+  const [bestSellers, setBestSellers] = useState([]);
+  const [topCategories, setTopCategories] = useState([]);
   const [index, setIndex] = useState(0);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [wishlist, setWishlist] = useState([]);
-  const [wishlistOpen, setWishlistOpen] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false); // ✅ keep modal local only
+
+  /* ✅ Load Best Sellers */
+  useEffect(() => {
+    API.get("/products/bestsellers")
+      .then((res) => {
+        setBestSellers(res.data.products || []);
+        localStorage.setItem("bestSellers", JSON.stringify(res.data.products || []));
+      })
+      .catch((err) => {
+        console.error("Failed to load best sellers:", err);
+        const saved = localStorage.getItem("bestSellers");
+        if (saved) setBestSellers(JSON.parse(saved));
+      });
+  }, []);
+
+  /* ✅ Load Top Categories */
+  useEffect(() => {
+    API.get("/topcategories")
+      .then((res) => {
+        setTopCategories(res.data || []);
+        localStorage.setItem("categories", JSON.stringify(res.data || []));
+      })
+      .catch((err) => {
+        console.error("Failed to load categories:", err);
+        const savedCats = localStorage.getItem("categories");
+        if (savedCats) setTopCategories(JSON.parse(savedCats));
+      });
+  }, []);
 
   const visibleCount = 5;
-  const maxIndex = Math.ceil(BEST.length / visibleCount) - 1;
+  const maxIndex = Math.ceil(bestSellers.length / visibleCount) - 1;
 
   const handleQuickView = (product) => setQuickViewProduct(product);
+
   const handleAddToCart = (product) => {
     addToCart(product, 1);
     setQuickViewProduct(null);
-  };
-  const handleAddToWishlist = (product) => {
-    if (!wishlist.find((p) => p.id === product.id)) {
-      setWishlist((prev) => [...prev, product]);
-    }
-    setWishlistOpen(true);
   };
 
   return (
@@ -66,22 +79,27 @@ export default function Home() {
       <HeroCarousel />
 
       {/* Best Sellers */}
-      <Container sx={{ py: 4 }}>
-        <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, textAlign: "center" }}>
-          {t("sections.bestSellers") || "Best Sellers"}
-        </Typography>
+        <Container sx={{ py: 4, mb: 6 }}>
+           <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, textAlign: "center" }}> 
+            {t("sections.bestSellers") || "Best Sellers"} 
+            </Typography>
 
         <Box sx={{ position: "relative" }}>
           <Box sx={{ display: "flex", gap: 2, overflow: "hidden" }}>
-            {BEST.slice(index * visibleCount, (index + 1) * visibleCount).map((p) => (
-              <Box key={p.id} sx={{ minWidth: 220 }}>
-                <ProductCard
-                  product={p}
-                  onQuickView={handleQuickView}
-                  onAddToWishlist={handleAddToWishlist}
-                />
-              </Box>
-            ))}
+            {bestSellers
+              .slice(index * visibleCount, (index + 1) * visibleCount)
+              .map((p) => (
+                <Box key={p.id || p._id} sx={{ minWidth: 220 }}>
+                  <ProductCard
+                    product={p}
+                    onQuickView={handleQuickView}
+                    onAddToWishlist={(prod) => {
+                      addToWishlist(prod); // ✅ use context
+                      setWishlistOpen(true); // open modal
+                    }}
+                  />
+                </Box>
+              ))}
           </Box>
 
           {/* Arrows */}
@@ -91,6 +109,7 @@ export default function Home() {
           >
             <ArrowBackIosNewIcon />
           </IconButton>
+
           <IconButton
             onClick={() => setIndex((i) => Math.min(i + 1, maxIndex))}
             sx={{ position: "absolute", top: "50%", right: -20, transform: "translateY(-50%)" }}
@@ -108,68 +127,98 @@ export default function Home() {
         />
       </Container>
 
-      {/* Wishlist Modal */}
+      {/* Top Categories */}
+      <Container sx={{ py: 4,  mb: 6 }}>
+        <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, textAlign: "center" }}>
+          {t("sections.topCategories") || "Top Categories"}
+        </Typography>
+
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", justifyContent: "center" }}>
+          {topCategories.map((cat) => (
+            <Button
+              key={cat._id}
+              variant="outlined"
+              sx={{
+                width: 160,
+                height: 160,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 2,
+                p: 2,
+                background: "#fff",
+                boxShadow: 1
+              }}
+              onClick={() =>
+                (window.location.href = `/category/${encodeURIComponent(cat.name)}`)
+              }
+            >
+              <img
+                src={cat.img}
+                alt={cat.name}
+                style={{ width: 80, height: 80, objectFit: "cover", marginBottom: 8 }}
+              />
+              <Typography variant="subtitle1" fontWeight={600}>
+                {cat.name}
+              </Typography>
+              <Typography
+                variant="caption"
+                color={cat.count === 0 ? "error" : "text.secondary"}
+                sx={{ fontWeight: 500 }}
+              >
+                {cat.count === 0 ? "Out of Stock" : `${cat.count} products`}
+              </Typography>
+            </Button>
+          ))}
+        </Box>
+      </Container>
+
+      {/* Wishlist Modal (uses global wishlist) */}
       <Modal open={wishlistOpen} onClose={() => setWishlistOpen(false)}>
         <Box sx={{ p: 4, background: "#fff", borderRadius: 2, maxWidth: 600, mx: "auto", mt: 10 }}>
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
             My Wishlist
           </Typography>
+
           {wishlist.length === 0 ? (
             <Typography>No items in wishlist.</Typography>
           ) : (
             wishlist.map((item) => (
               <Box
-                key={item.id}
+                key={item.id || item._id}
                 sx={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
                   borderBottom: "1px solid #eee",
-                  py: 1,
-                  mb: 1
+                  py: 1
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <img
                     src={item.img}
-                    alt={item.title}
+                    alt={item.name}
                     style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 6 }}
                   />
-                  <Typography variant="subtitle1">{t(`products.${item.id}`, { defaultValue: t(`products.${item.title}`, { defaultValue: item.title }) })}</Typography>
+                  <Typography>{item.name}</Typography>
                 </Box>
                 <Typography>{formatSAR(item.price, lang)}</Typography>
               </Box>
             ))
           )}
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2 }}
-            onClick={() => setWishlistOpen(false)}
-          >
+
+          <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={() => setWishlistOpen(false)}>
             Close
           </Button>
         </Box>
       </Modal>
 
-      {/* Categories */}
-      <CategoriesScroller />
-
-      {/* Why Shop with Top Gear */}
+      {/* Extra Sections */}
       <WhyShop />
-
-      {/* Booking Section */}
       <BookingSection />
-
-      {/* Car Needs Section */}
       <CarNeeds />
-
-      {/* Instagram Section */}
       <InstagramSection />
-
-      {/* Footer
-      <Footer /> */}
     </Box>
   );
 }

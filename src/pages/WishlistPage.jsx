@@ -13,11 +13,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Header from "../components/Header";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
-import { formatSAR } from "../utils/currency";   // ✅ fixed import
+import { formatSAR } from "../utils/currency";
+import { useWishlist } from "../context/WishlistContext";
 
 export default function WishlistPage() {
-  const { wishlist, removeFromWishlist, addToCart } = useCart();
+  const { addToCart } = useCart();
   const { t, lang } = useLanguage();
+  const { wishlist, removeFromWishlist, addToWishlist } = useWishlist();
 
   return (
     <>
@@ -31,7 +33,7 @@ export default function WishlistPage() {
         ) : (
           <Grid container spacing={2}>
             {wishlist.map((item) => (
-              <Grid item xs={12} md={6} key={item.id}>
+              <Grid item xs={12} md={6} key={item.id || item._id}>
                 <Paper sx={{ p: 2 }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <img
@@ -46,16 +48,22 @@ export default function WishlistPage() {
                     />
                     <Box sx={{ flexGrow: 1 }}>
                       <Typography sx={{ fontWeight: 600 }}>
-                        {t(`products.${item.id}`, { defaultValue: t(`products.${item.title}`, { defaultValue: item.title }) })}
+                        {t(`products.${item.id}`, {
+                          defaultValue: t(`products.${item.title}`, {
+                            defaultValue: item.title
+                          })
+                        })}
                       </Typography>
                       <Typography color="text.secondary">
                         {formatSAR(item.price, lang)}
                       </Typography>
                     </Box>
-                    <IconButton onClick={() => removeFromWishlist(item.id)}>
+                    <IconButton onClick={() => removeFromWishlist(item.id || item._id)}>
                       <DeleteIcon />
                     </IconButton>
                   </Box>
+
+                  {/* Action buttons */}
                   <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
                     <Button
                       variant="contained"
@@ -66,9 +74,16 @@ export default function WishlistPage() {
                     <Button
                       variant="outlined"
                       color="error"
-                      onClick={() => removeFromWishlist(item.id)}
+                      onClick={() => removeFromWishlist(item.id || item._id)}
                     >
                       Remove
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => addToWishlist(item)}
+                    >
+                      Add Again
                     </Button>
                   </Box>
                 </Paper>

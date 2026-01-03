@@ -12,23 +12,26 @@ export default function InstagramSection() {
     <Box sx={{ backgroundColor: "#f5f5f5", py: 6 }}>
       <Container>
         {/* Heading */}
-        <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, textAlign: "center" }}>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 800, mb: 2, textAlign: "center" }}
+        >
           Stay Updated — Follow Us on Instagram
         </Typography>
 
-        {/* Follow Us button */}
+        {/* Follow Us button (merged from FollowUs.jsx) */}
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Button
             variant="contained"
-            color="primary"
-            href="https://www.instagram.com/tazweed___car_decor_?igsh=ejFuMWxsMXBiY3hw"
+            color="secondary"
+            href="https://instagram.com/yourcarshop"
             target="_blank"
           >
             Follow Us
           </Button>
         </Box>
 
-        {/* 3 Instagram posts with hover effect */}
+        {/* Instagram posts with hover effect */}
         <Grid container spacing={3} justifyContent="center">
           {posts.map((url, idx) => (
             <Grid item xs={12} md={4} key={idx}>

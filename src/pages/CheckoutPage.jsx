@@ -1,188 +1,138 @@
 import React, { useState } from "react";
 import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Grid,
-  TextField,
-  MenuItem,
-  IconButton,
-  Divider
+  Container, Typography, Grid, TextField, Button, Paper, Box,
+  Divider, RadioGroup, FormControlLabel, Radio
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "../context/LanguageContext";
-import { formatSAR } from "../utils/currency";
+import { useCart } from "../context/CartContext";
 
 export default function CheckoutPage() {
-  const { cart, subtotal, cartCount, updateQty, removeFromCart, clearCart } = useCart();
-  const { t, lang } = useLanguage();
+  const { cartItems, subtotal, clearCart } = useCart();
   const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem("token");
 
-  const [shipping, setShipping] = useState({ name: "", address: "", phone: "" });
-  const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [billing, setBilling] = useState({
+    firstName: "", lastName: "", address: "", city: "", state: "",
+    phone: "", email: ""
+  });
 
-  const handleChange = (e) => {
-    setShipping({ ...shipping, [e.target.name]: e.target.value });
+  const [errors, setErrors] = useState({});
+  const [paymentMethod, setPaymentMethod] = useState("cod");
+
+  const validateFields = () => {
+    const newErrors = {};
+    Object.entries(billing).forEach(([key, value]) => {
+      if (!value.trim()) newErrors[key] = "Required";
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Razorpay integration trigger
-  const handleRazorpay = () => {
-    const options = {
-      key: "YOUR_RAZORPAY_KEY", // replace with your Razorpay key
-      amount: subtotal * 100, // amount in paise
-      currency: "SAR",
-      name: "TopGear Auto",
-      description: "Order Payment",
-      handler: function (response) {
-        alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
-        clearCart();
-        navigate("/success", { state: { shipping, paymentMethod, subtotal, cartCount } });
-      },
-      prefill: {
-        name: shipping.name,
-        email: "customer@example.com",
-        contact: shipping.phone,
-      },
-      theme: { color: "#3399cc" },
-    };
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  };
-
-  const handleConfirm = () => {
-    if (!shipping.name || !shipping.address || !shipping.phone) {
-      alert("Please fill in all shipping details.");
+  const handlePlaceOrder = () => {
+    if (!isLoggedIn) {
+      alert("Please login or create an account before placing order.");
       return;
     }
+    if (!validateFields()) return;
 
-    if (paymentMethod === "Razorpay") {
-      handleRazorpay();
-    } else {
-      clearCart();
-      navigate("/success", { state: { shipping, paymentMethod, subtotal, cartCount } });
-    }
+    console.log("Order placed:", { billing, cartItems, paymentMethod });
+    clearCart();
+    navigate("/order-success");
   };
 
   return (
-    <Container sx={{ mt: 12, mb: 6 }}>
-      <Typography variant="h4" sx={{ fontWeight: 800, mb: 3 }}>
-        Checkout
-      </Typography>
+    <>
+      {/* Top Tabs */}
+      <Box sx={{ background: "#333", color: "#fff", py: 1 }}>
+        <Container sx={{ display: "flex", gap: 4 }}>
+          <Typography sx={{ opacity: 0.6 }}>Shopping Cart</Typography>
+          <Typography sx={{ fontWeight: 600 }}>Checkout Details</Typography>
+          <Typography sx={{ opacity: 0.6 }}>Order Complete</Typography>
+        </Container>
+      </Box>
 
-      {cart.length === 0 ? (
-        <Typography>Your cart is empty. Please add items before checkout.</Typography>
-      ) : (
-        <Grid container spacing={3}>
-          {/* Left Column: Items */}
-          <Grid item xs={12} md={8}>
-            <Box sx={{ border: "1px solid #eee", borderRadius: 2, p: 2 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                Order Items
-              </Typography>
-              {cart.map((item) => (
-                <Box
-                  key={item.id}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    borderBottom: "1px solid #f0f0f0",
-                    py: 1
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <img
-                      src={item.img}
-                      alt={item.title}
-                      style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 6 }}
+      {/* Red Banner */}
+      <Box sx={{ background: "#e00000", color: "#fff", py: 1, textAlign: "center" }}>
+        <Typography variant="body2">
+          Free Shipping Above SAR 999 | Easy EMI | Secure Payments
+        </Typography>
+      </Box>
+
+      {/* Checkout Content */}
+      <Container sx={{ pt: { xs: 10, md: 12 }, pb: 6 }}>
+        <Typography variant="h5" sx={{ mb: 3 }}>Checkout Details</Typography>
+
+        <Grid container spacing={4}>
+          {/* Billing Form */}
+          <Grid item xs={12} md={7}>
+            <Paper elevation={2} sx={{ p: 3 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>Billing Details</Typography>
+              <Grid container spacing={2}>
+                {["firstName", "lastName", "address", "city", "state", "phone", "email"].map((field) => (
+                  <Grid item xs={field === "address" ? 12 : 6} key={field}>
+                    <TextField
+                      label={`${field.charAt(0).toUpperCase() + field.slice(1)} *`}
+                      fullWidth
+                      value={billing[field]}
+                      onChange={(e) => setBilling({ ...billing, [field]: e.target.value })}
+                      error={!!errors[field]}
+                      helperText={errors[field]}
                     />
-                    <Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                        {t(`products.${item.id}`, { defaultValue: t(`products.${item.title}`, { defaultValue: item.title }) })}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {formatSAR(item.price, lang)}
-                      </Typography>
-                    </Box>
-                  </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </Paper>
+          </Grid>
 
-                  {/* + / - buttons */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => updateQty(item.id, (item.qty || 1) - 1)}
-                    >
-                      -
-                    </Button>
-                    <Typography>{item.qty || 1}</Typography>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => updateQty(item.id, (item.qty || 1) + 1)}
-                    >
-                      +
-                    </Button>
-                  </Box>
-
-                  {/* Delete button */}
-                  <IconButton color="error" onClick={() => removeFromCart(item.id)}>
-                    <DeleteIcon />
-                  </IconButton>
+          {/* Order Summary */}
+          <Grid item xs={12} md={5}>
+            <Paper elevation={2} sx={{ p: 3 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>Your Order</Typography>
+              <Divider sx={{ mb: 2 }} />
+              {cartItems.map((item) => (
+                <Box key={item.id} sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                  <Typography>{item.name} × {item.qty}</Typography>
+                  <Typography>SAR {item.price * item.qty}</Typography>
                 </Box>
               ))}
-            </Box>
-          </Grid>
+              <Divider sx={{ my: 2 }} />
+              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                <Typography>Subtotal:</Typography>
+                <Typography>SAR {subtotal}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+                <Typography><b>Total:</b></Typography>
+                <Typography><b>SAR {subtotal}</b></Typography>
+              </Box>
 
-          {/* Right Column: Summary + Shipping Form */}
-          <Grid item xs={12} md={4}>
-            <Box sx={{ border: "1px solid #eee", borderRadius: 2, p: 3, background: "#fafafa" }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                Order Summary
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-              <Typography variant="body1" sx={{ mb: 1 }}>
-                Items: {cartCount}
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 1 }}>
-                Subtotal: {formatSAR(subtotal, lang)}
-              </Typography>
-
-              {/* Shipping Info */}
-              <TextField fullWidth label="Full Name" name="name" value={shipping.name} onChange={handleChange} sx={{ mb: 2 }} />
-              <TextField fullWidth label="Address" name="address" value={shipping.address} onChange={handleChange} sx={{ mb: 2 }} />
-              <TextField fullWidth label="Phone Number" name="phone" value={shipping.phone} onChange={handleChange} sx={{ mb: 2 }} />
-
-              {/* Payment Method Dropdown */}
-              <TextField
-                select
-                fullWidth
-                label="Payment Method"
+              {/* Payment Options */}
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Payment Method</Typography>
+              <RadioGroup
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                sx={{ mb: 2 }}
               >
-                <MenuItem value="COD">Cash on Delivery</MenuItem>
-                <MenuItem value="Mada">Mada Debit Card</MenuItem>
-                <MenuItem value="Visa">Visa/Mastercard</MenuItem>
-                <MenuItem value="STC">STC Pay</MenuItem>
-                <MenuItem value="ApplePay">Apple Pay</MenuItem>
-                <MenuItem value="Razorpay">Razorpay</MenuItem>
-              </TextField>
+                <FormControlLabel value="cod" control={<Radio />} label="Cash on Delivery" />
+                <FormControlLabel value="mada" control={<Radio />} label="Mada Debit Card" />
+                <FormControlLabel value="stcpay" control={<Radio />} label="STC Pay" />
+                <FormControlLabel value="applepay" control={<Radio />} label="Apple Pay" />
+                <FormControlLabel value="card" control={<Radio />} label="Visa/Mastercard" />
+                <FormControlLabel value="razorpay" control={<Radio />} label="Pay by Razorpay" />
+                <FormControlLabel value="paytabs" control={<Radio />} label="PayTabs (Saudi Gateway)" />
+              </RadioGroup>
 
-              <Button variant="contained" color="primary" fullWidth sx={{ mb: 1 }} onClick={handleConfirm}>
-                Confirm Order
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 3 }}
+                onClick={handlePlaceOrder}
+              >
+                Place Order
               </Button>
-              <Button variant="outlined" color="error" fullWidth onClick={clearCart}>
-                Clear Cart
-              </Button>
-            </Box>
+            </Paper>
           </Grid>
         </Grid>
-      )}
-    </Container>
+      </Container>
+    </>
   );
 }

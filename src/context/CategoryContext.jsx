@@ -1,32 +1,66 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import { API } from "../utils/api";
 
 const CategoryContext = createContext();
 
 export const CategoryProvider = ({ children }) => {
-  const [categories, setCategories] = useState([
-    { id: 1, name: "Engine Oil", type: "Original", price: 120, stock: 10, status: "Active" },
-    { id: 2, name: "Spark Plugs", type: "Local", price: 25, stock: 0, status: "Inactive" }
-  ]);
+  const [categories, setCategories] = useState([]);
+  const [error, setError] = useState(null);
 
-  const addCategory = (category) => {
-    const stockNum = Number(category.stock) || 0;
-    setCategories((prev) => [
-      { ...category, id: Date.now(), stock: stockNum, status: stockNum === 0 ? "Inactive" : "Active" },
-      ...prev
-    ]);
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCategories = async () => {
+      try {
+        const res = await API.get("/categories");
+        if (isMounted) setCategories(res.data || []);
+      } catch (err) {
+        if (isMounted) {
+          console.error("Category fetch failed:", err);
+          setError("Failed to load categories");
+        }
+      }
+    };
+
+    fetchCategories();
+    return () => { isMounted = false; };
+  }, []);
+
+  const addCategory = async (category) => {
+    try {
+      const res = await API.post("/categories", category);
+      setCategories(res.data || []);
+    } catch (err) {
+      console.error("Add category failed:", err);
+      setError("Failed to add category");
+    }
   };
 
-  const deleteCategory = (id) => setCategories((prev) => prev.filter((c) => c.id !== id));
-  const updateCategory = (id, data) => {
-    const stockNum = Number(data.stock) || 0;
-    setCategories((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...data, stock: stockNum, status: stockNum === 0 ? "Inactive" : "Active" } : c))
-    );
+  const deleteCategory = async (id) => {
+    try {
+      const res = await API.delete(`/categories/${id}`);
+      setCategories(res.data || []);
+    } catch (err) {
+      console.error("Delete category failed:", err);
+      setError("Failed to delete category");
+    }
   };
-  const viewCategory = (id) => categories.find((c) => c.id === id);
+
+  const updateCategory = async (id, data) => {
+    try {
+      const res = await API.put(`/categories/${id}`, data);
+      setCategories(res.data || []);
+    } catch (err) {
+      console.error("Update category failed:", err);
+      setError("Failed to update category");
+    }
+  };
+
+  const viewCategory = (id) => categories.find((c) => c._id === id);
 
   return (
-    <CategoryContext.Provider value={{ categories, addCategory, deleteCategory, updateCategory, viewCategory }}>
+    <CategoryContext.Provider
+      value={{ categories, addCategory, deleteCategory, updateCategory, viewCategory, error }}
+    >
       {children}
     </CategoryContext.Provider>
   );

@@ -12,10 +12,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
 import { formatSAR } from "../utils/currency";
+import { useNavigate } from "react-router-dom";
 
 export default function QuickViewModal({ open, onClose, product }) {
   const { addToCart, addToWishlist } = useCart();
   const { t, lang } = useLanguage();
+  const navigate = useNavigate();
+
   const [quantity, setQuantity] = useState(1);
   if (!product) return null;
 
@@ -65,15 +68,17 @@ export default function QuickViewModal({ open, onClose, product }) {
           <Box
             sx={{ mt: 3, display: "flex", gap: 2, justifyContent: "center" }}
           >
-            <Button
-              variant="contained"
-              onClick={() => {
-                addToCart(product, quantity);
-                onClose();
-              }}
-            >
-              Add to Cart
-            </Button>
+           <Button
+  variant="contained"
+  onClick={() => {
+    addToCart(product, quantity);
+    onClose();
+    navigate("/cart"); // ✅ redirect to cart
+  }}
+>
+  Add to Cart
+</Button>
+
             <Button
               variant="outlined"
               onClick={() => {

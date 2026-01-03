@@ -7,12 +7,11 @@ const resources = {
     translation: {
       nav: {
         home: "Home",
-        engine: "Engine Parts",
-        tyres: "Tyres",
-        accessories: "Accessories",
-        lights: "Lights",
-        spares: "Spares",
-        service: "Service",
+        bumper: "Bumper",
+        filters: "Filters",
+        masura: "Masura",
+        khath: "Khath",
+        mirrors: "Mirrors",
         others: "Others",
         searchPlaceholder: "Search motorcycle parts..."
       },
@@ -40,32 +39,31 @@ const resources = {
         "Tail Light": "Tail Light",
         "Indicator Set": "Indicator Set",
         "Projector Lamp": "Projector Lamp"
+      },
+      cart: {
+        title: "Shopping Cart",
+        empty: "Your cart is empty.",
+        shopProducts: "Shop Products",
+        adjustQuantities: "Tip: Adjust quantities to update totals",
+        clearCart: "Clear Cart",
+        cartTotals: "Cart Totals",
+        subtotal: "Subtotal",
+        shipping: "Shipping",
+        shippingCalc: "Calculated at checkout",
+        total: "Total",
+        checkout: "Proceed to Checkout"
       }
-        },
-        cart: {
-          title: "Shopping Cart",
-          empty: "Your cart is empty.",
-          shopProducts: "Shop Products",
-          adjustQuantities: "Tip: Adjust quantities to update totals",
-          clearCart: "Clear Cart",
-          cartTotals: "Cart Totals",
-          subtotal: "Subtotal",
-          shipping: "Shipping",
-          shippingCalc: "Calculated at checkout",
-          total: "Total",
-          checkout: "Proceed to Checkout"
     }
   },
   ar: {
     translation: {
       nav: {
         home: "الرئيسية",
-        engine: "قطع المحرك",
-        tyres: "الإطارات",
-        accessories: "الاكسسوارات",
-        lights: "الأنوار",
-        spares: "القطع",
-        service: "الخدمة",
+        bumper: "الصدام",
+        filters: "الفلاتر",
+        masura: "ماسورة",
+        khath: "خط",
+        mirrors: "المرايا",
         others: "أخرى",
         searchPlaceholder: "ابحث عن قطع الدراجات النارية..."
       },
@@ -93,20 +91,20 @@ const resources = {
         "Tail Light": "مصباح الذيل",
         "Indicator Set": "مجموعة المؤشرات",
         "Projector Lamp": "مصباح العاكس"
+      },
+      cart: {
+        title: "سلة التسوق",
+        empty: "سلتك فارغة.",
+        shopProducts: "تسوق المنتجات",
+        adjustQuantities: "نصيحة: اضبط الكميات لتحديث الإجماليات",
+        clearCart: "مسح السلة",
+        cartTotals: "إجمالي السلة",
+        subtotal: "المجموع الجزئي",
+        shipping: "الشحن",
+        shippingCalc: "يتم حسابه عند الدفع",
+        total: "الإجمالي",
+        checkout: "المتابعة للدفع"
       }
-        },
-        cart: {
-          title: "سلة التسوق",
-          empty: "سلتك فارغة.",
-          shopProducts: "تسوق المنتجات",
-          adjustQuantities: "نصيحة: اضبط الكميات لتحديث الإجماليات",
-          clearCart: "مسح السلة",
-          cartTotals: "إجمالي السلة",
-          subtotal: "المجموع الجزئي",
-          shipping: "الشحن",
-          shippingCalc: "يتم حسابه عند الدفع",
-          total: "الإجمالي",
-          checkout: "المتابعة للدفع"
     }
   }
 };

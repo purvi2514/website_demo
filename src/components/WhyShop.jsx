@@ -1,8 +1,5 @@
 import React from "react";
-import { Container, Typography, Grid, Paper, Box } from "@mui/material";
-import SecurityIcon from "@mui/icons-material/Security";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import HeadsetMicIcon from "@mui/icons-material/HeadsetMic";
+import { Container, Typography } from "@mui/material";
 
 export default function WhyShop() {
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -10,15 +10,23 @@ import {
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { CATEGORIES } from "../data";
 import { useNavigate } from "react-router-dom";
 
 export default function CategoriesScroller() {
   const [index, setIndex] = useState(0);
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
+  // ✅ Load categories from localStorage (admin panel)
+  useEffect(() => {
+    const savedCats = localStorage.getItem("categories");
+    if (savedCats) {
+      setCategories(JSON.parse(savedCats));
+    }
+  }, []);
+
   const visibleCount = 5;
-  const maxIndex = Math.ceil(CATEGORIES.length / visibleCount) - 1;
+  const maxIndex = Math.ceil(categories.length / visibleCount) - 1;
 
   return (
     <Container sx={{ py: 4 }}>
@@ -29,32 +37,35 @@ export default function CategoriesScroller() {
         Top Categories
       </Typography>
 
-      {/* Categories scroller */}
       <Box sx={{ position: "relative" }}>
         <Box sx={{ display: "flex", gap: 2, overflow: "hidden" }}>
-          {CATEGORIES.slice(index * visibleCount, (index + 1) * visibleCount).map((cat) => (
-            <Card
-              key={cat.slug}
-              sx={{ minWidth: 220, cursor: "pointer" }}
-              onClick={() => navigate(`/category/${cat.slug}`)} // ✅ navigate to category page
-            >
-              <CardMedia
-                component="img"
-                height="140"
-                image={cat.image}
-                alt={cat.title}
-                sx={{ objectFit: "cover" }}
-              />
-              <CardContent sx={{ textAlign: "center" }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                  {cat.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {cat.count} products
-                </Typography>
-              </CardContent>
-            </Card>
-          ))}
+          {categories
+            .slice(index * visibleCount, (index + 1) * visibleCount)
+            .map((cat) => (
+              <Card
+                key={cat.id}
+                sx={{ minWidth: 220, cursor: "pointer" }}
+                onClick={() =>
+                  navigate(`/category/${encodeURIComponent(cat.title)}`)
+                }
+              >
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image={cat.img}
+                  alt={cat.title}
+                  sx={{ objectFit: "cover" }}
+                />
+                <CardContent sx={{ textAlign: "center" }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                    {cat.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {cat.count} products
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
         </Box>
 
         {/* Arrows */}
@@ -81,8 +92,6 @@ export default function CategoriesScroller() {
           <ArrowForwardIosIcon />
         </IconButton>
       </Box>
-
-    
     </Container>
   );
 }

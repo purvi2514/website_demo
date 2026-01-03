@@ -5,207 +5,136 @@ import {
   Grid,
   Paper,
   Box,
-  Divider,
   Button,
+  TextField,
+  Divider
 } from "@mui/material";
-import { Link } from "react-router-dom";
-import Header from "../components/Header";
+import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { useLanguage } from "../context/LanguageContext";
-import { formatSAR } from "../utils/currency";
 
 export default function CartPage() {
-  const { cart, removeFromCart, clearCart, subtotal } = useCart();
-  const { t, lang } = useLanguage();
+  const { cartItems, updateQty, removeItem, subtotal } = useCart();
+  const navigate = useNavigate();
 
   return (
     <>
-      <Header />
+      {/* ✅ Top Tabs */}
+      <Box sx={{ background: "#333", color: "#fff", py: 1 }}>
+        <Container sx={{ display: "flex", gap: 4 }}>
+          <Typography sx={{ fontWeight: 600 }}>Shopping Cart</Typography>
+          <Typography sx={{ opacity: 0.6 }}>Checkout Details</Typography>
+          <Typography sx={{ opacity: 0.6 }}>Order Complete</Typography>
+        </Container>
+      </Box>
 
-      {/* MAIN WRAPPER */}
-      <Container maxWidth="xl" sx={{ mt: 12, mb: 6 }}>
-        <Box maxWidth="1200px" mx="auto">
-          <Typography variant="h5" fontWeight={800} mb={3}>
-            {t("cart.title")} ({cart.length})
-          </Typography>
+      {/* ✅ Red Banner */}
+      <Box sx={{ background: "#e00000", color: "#fff", py: 1, textAlign: "center" }}>
+        <Typography variant="body2">
+          Free Shipping Above SAR 999 | Easy EMI | Secure Payments
+        </Typography>
+      </Box>
 
-          {cart.length === 0 ? (
-            <Box textAlign="center" py={8}>
-              <Typography>{t("cart.empty")}</Typography>
-              <Button
-                component={Link}
-                to="/products"
-                variant="contained"
-                sx={{ mt: 2 }}
-              >
-                {t("cart.shopProducts")}
-              </Button>
-            </Box>
-          ) : (
-            <Grid container spacing={4}>
-              {/* LEFT – CART ITEMS */}
-              <Grid item xs={12} md={8}>
-                {cart.map((item) => (
-                  <Paper
-                    key={item.id}
-                    sx={{
-                      p: 2,
-                      mb: 2,
-                      width: "100%",
-                      borderRadius: 1,
-                      boxShadow: "none",
-                      borderBottom: "1px solid #e5e5e5",
-                    }}
-                  >
-                    <Grid
-                      container
-                      alignItems="center"
-                      spacing={2}
-                      wrap="nowrap"
-                    >
-                      {/* IMAGE */}
-                      <Grid item>
-                        <Box
-                          component="img"
-                          src={item.img}
-                          alt={item.title}
-                          sx={{
-                            width: 90,
-                            height: 90,
-                            objectFit: "contain",
-                          }}
-                        />
-                      </Grid>
+      {/* ✅ Cart Content */}
+      <Container sx={{ pt: { xs: 10, md: 12 }, pb: 6 }}>
+        <Typography variant="h5" sx={{ mb: 3 }}>Shopping Cart</Typography>
 
-                      {/* PRODUCT NAME */}
-                      <Grid item xs>
-                        <Typography fontWeight={700} noWrap>
-                          {t(`products.${item.id}`, {
-                            defaultValue: item.title,
-                          })}
-                        </Typography>
-                      </Grid>
+        {cartItems.length === 0 ? (
+          <Typography>No items in cart.</Typography>
+        ) : (
+          <Grid container spacing={3}>
+            {/* Left side: Items */}
+            <Grid item xs={12} md={8}>
+              {/* ✅ Table Headers */}
+              <Box sx={{ display: "flex", px: 2, py: 1, background: "#f5f5f5", fontWeight: 600 }}>
+                <Box sx={{ width: 80 }}></Box>
+                <Box sx={{ width : 200 }}>Product</Box>
+                <Box sx={{ width: 100 }}>Price</Box>
+                <Box sx={{ width: 100 }}>Quantity</Box>
+                <Box sx={{ width: 120 }}>Subtotal</Box>
+                <Box sx={{ width: 80 }}></Box>
+              </Box>
 
-                      {/* QTY */}
-                      <Grid item>
-                        <Typography color="text.secondary">
-                          Qty: {item.qty}
-                        </Typography>
-                      </Grid>
-
-                      {/* PRICE EACH */}
-                      <Grid item>
-                        <Typography color="text.secondary">
-                          {formatSAR(item.price, lang)}
-                        </Typography>
-                      </Grid>
-
-                      {/* TOTAL */}
-                      <Grid item>
-                        <Typography fontWeight={700}>
-                          {formatSAR(item.price * item.qty, lang)}
-                        </Typography>
-                      </Grid>
-
-                      {/* ACTIONS */}
-                      <Grid item>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => removeFromCart(item.id)}
-                          sx={{ textTransform: "uppercase", mr: 1 }}
-                        >
-                          Remove
-                        </Button>
-
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          disabled
-                          sx={{ textTransform: "uppercase" }}
-                        >
-                          Edit
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </Paper>
-                ))}
-
-                <Button
-                  variant="text"
-                  color="error"
-                  onClick={clearCart}
-                  size="small"
-                >
-                  {t("cart.clearCart")}
-                </Button>
-              </Grid>
-
-              {/* RIGHT – SUMMARY */}
-              <Grid
-                item
-                xs={12}
-                md={4}
-                sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <Paper
-                  sx={{
-                    p: 3,
-                    width: "100%",
-                    maxWidth: 380,
-                    borderRadius: 1,
-                    boxShadow: "none",
-                    border: "1px solid #e5e5e5",
-                    position: "sticky",
-                    top: 96,
-                  }}
-                >
-                  <Typography variant="h6" fontWeight={700}>
-                    {t("cart.cartTotals")}
-                  </Typography>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography>{t("cart.subtotal")}</Typography>
-                    <Typography fontWeight={600}>
-                      {formatSAR(subtotal, lang)}
-                    </Typography>
+              {cartItems.map(item => (
+                <Paper key={item.id} sx={{ p: 2, mb: 2, display: "flex", alignItems: "center" }}>
+                  {/* Image */}
+                  <Box
+                    component="img"
+                    src={item.img}
+                    alt={item.name}
+                    sx={{ width: 80, height: 80, objectFit: "cover", mr: 2 }}
+                  />
+                  {/* Name */}
+                  <Box sx={{ flex: 1 }}>
+                    <Typography sx={{ fontWeight: 600 }}>{item.name}</Typography>
                   </Box>
-
-                  <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography>{t("cart.shipping")}</Typography>
-                    <Typography color="text.secondary">
-                      {t("cart.shippingCalc")}
-                    </Typography>
+                  {/* Price */}
+                  <Box sx={{ width: 100 }}>
+                    <Typography>SAR {item.price}</Typography>
                   </Box>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography fontWeight={700}>{t("cart.total")}</Typography>
-                    <Typography fontWeight={700}>
-                      {formatSAR(subtotal, lang)}
-                    </Typography>
+                  {/* Quantity */}
+                  <Box sx={{ width: 100 }}>
+                    <TextField
+                      type="number"
+                      size="small"
+                      value={item.qty}
+                      onChange={(e) => updateQty(item.id, parseInt(e.target.value))}
+                      inputProps={{ min: 1 }}
+                      sx={{ width: 60 }}
+                    />
                   </Box>
-
-                  <Button
-                    component={Link}
-                    to="/checkout"
-                    variant="contained"
-                    fullWidth
-                    sx={{ mt: 3, py: 1.2, textTransform: "uppercase" }}
-                  >
-                    {t("cart.checkout")}
-                  </Button>
+                  {/* Subtotal */}
+                  <Box sx={{ width: 120 }}>
+                    <Typography>SAR {item.price * item.qty}</Typography>
+                  </Box>
+                  {/* Remove */}
+                  <Box sx={{ width: 80 }}>
+                    <Button color="error" onClick={() => removeItem(item.id)}>Remove</Button>
+                  </Box>
                 </Paper>
-              </Grid>
+              ))}
+
+              {/* ✅ Continue + Update buttons */}
+              <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+                <Button component={Link} to="/products" variant="outlined" color="inherit">
+                  ← Continue Shopping
+                </Button>
+                <Button variant="contained" color="secondary" onClick={() => console.log("Cart updated")}>
+                  Update Cart
+                </Button>
+              </Box>
             </Grid>
-          )}
-        </Box>
+
+            {/* Right side: Coupon + Totals */}
+            <Grid item xs={12} md={4}>
+              <Paper sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>Coupon</Typography>
+                <TextField label="Coupon Code" fullWidth size="small" sx={{ mb: 2 }} />
+                <Button variant="outlined">Apply Coupon</Button>
+              </Paper>
+
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>Cart Totals</Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                  <Typography>Subtotal:</Typography>
+                  <Typography>SAR {subtotal}</Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+                  <Typography><b>Total:</b></Typography>
+                  <Typography><b>SAR {subtotal}</b></Typography>
+                </Box>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  onClick={() => navigate("/checkout")}
+                >
+                  Proceed to Checkout
+                </Button>
+              </Paper>
+            </Grid>
+          </Grid>
+        )}
       </Container>
     </>
   );

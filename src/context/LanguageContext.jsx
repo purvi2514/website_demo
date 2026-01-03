@@ -6,12 +6,11 @@ const translations = {
   en: {
     nav: {
       home: "Home",
-      engine: "Engine Parts",
-      tyres: "Tyres",
-      accessories: "Accessories",
-      lights: "Lights",
-      spares: "Spares",
-      service: "Service",
+      bumper: "Bumper",
+      filters: "Filters",
+      masura: "Masura",
+      khath: "Khath",
+      mirrors: "Mirrors",
       others: "Others",
       search: "Search motorcycle & car parts..."
     },
@@ -76,17 +75,16 @@ const translations = {
     }
   },
   ar: {
-    nav: {
-      home: "الرئيسية",
-      engine: "قطع المحرك",
-      tyres: "الإطارات",
-      accessories: "الاكسسوارات",
-      lights: "الأنوار",
-      spares: "القطع",
-      service: "الخدمة",
-      others: "أخرى",
-      search: "ابحث عن قطع السيارات والدراجات..."
-    },
+     nav: {
+        home: "الرئيسية",
+        bumper: "الصدام",
+        filters: "الفلاتر",
+        masura: "ماسورة",
+        khath: "خط",
+        mirrors: "المرايا",
+        others: "أخرى",
+        searchPlaceholder: "ابحث عن قطع الدراجات النارية..."
+      },
     strip: "شحن مجاني فوق ٩٩٩ ريال | تقسيط سهل | مدفوعات آمنة",
     hero: { title: "الأداء في كل تفصيل", sub: "قطع مميزة. أسعار عادلة.", cta: "تسوق الآن" },
     sections: {
@@ -99,15 +97,16 @@ const translations = {
       submit: "طلب"
     },
     footer: {
-      contact: "تواصل",
-      quickLinks: "روابط سريعة",
-      support: "الدعم",
-      address: "الرياض، المملكة العربية السعودية",
-      email: "care@yourshop.sa",
-      call: "اتصل",
-      open: "مفتوح: الأحد–الخميس 9:30–19:00",
-      directions: "اتجاهات"
-    }
+  contact: "تواصل",
+  quickLinks: "روابط سريعة",
+  support: "الدعم",
+  address: "الرياض، المملكة العربية السعودية",
+  email: "care@yourshop.sa",
+  call: "اتصل: +966 56 627 9029",
+  open: "الأحد–الأحد: ١٠:٠٠ صباحاً – ١١:٣٠ مساءً | استراحة: ١:٠٠ ظهراً – ٣:٠٠ عصراً | الجمعة: ٣:٠٠ مساءً – ١١:٣٠ مساءً",
+  directions: "اتجاهات"
+}
+
     ,
     products: {
       "102": "STP",

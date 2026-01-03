@@ -1,0 +1,111 @@
+.page-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+.checkout-steps {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 40px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.checkout-steps span {
+  color: #aaa;
+}
+
+.checkout-steps .active {
+  color: #000;
+  font-weight: 700;
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+}
+
+.card-box {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  padding: 24px;
+  border-radius: 6px;
+}
+
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cart-table th,
+.cart-table td {
+  border-bottom: 1px solid #eee;
+  padding: 16px 8px;
+  text-align: left;
+}
+
+.cart-summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0;
+  font-size: 15px;
+}
+
+.checkout-btn {
+  width: 100%;
+  background: #000;
+  color: #fff;
+  padding: 14px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+.tg-cart-item {
+  display: flex;
+  gap: 20px;
+  background: #fff;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+}
+
+.tg-cart-item img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+}
+
+.tg-qty button {
+  width: 30px;
+  height: 30px;
+}
+
+.tg-cart-summary {
+  flex: 1 1 35%;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+}
+
+.tg-checkout {
+  max-width: 1200px;
+  margin: 140px auto;
+  display: flex;
+  gap: 40px;
+}
+
+.tg-billing,
+.tg-order {
+  flex: 1;
+  background: #fff;
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .tg-checkout {
+    flex-direction: column;
+  }
+}
